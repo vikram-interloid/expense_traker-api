@@ -5,6 +5,15 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
 
+from typing import TYPE_CHECKING
+
+from sqlalchemy.orm import relationship
+
+if TYPE_CHECKING:
+    from app.models.category import Category
+    from app.models.refresh_token import RefreshToken
+    from app.models.transaction import Transaction
+
 
 class User(Base):
     __tablename__ = "users"
@@ -17,12 +26,14 @@ class User(Base):
     username: Mapped[str] = mapped_column(
         String(50),
         unique=True,
+        index=True,
         nullable=False,
     )
 
     email: Mapped[str] = mapped_column(
         String(255),
         unique=True,
+        index=True,
         nullable=False,
     )
 
@@ -41,3 +52,18 @@ class User(Base):
         server_default=func.now(),
         onupdate=func.now(),
     )
+    
+    categories: Mapped[list["Category"]] = relationship(
+    back_populates="user",
+    cascade="all, delete-orphan",
+)
+
+transactions: Mapped[list["Transaction"]] = relationship(
+    back_populates="user",
+    cascade="all, delete-orphan",
+)
+
+refresh_tokens: Mapped[list["RefreshToken"]] = relationship(
+    back_populates="user",
+    cascade="all, delete-orphan",
+)
