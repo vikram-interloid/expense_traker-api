@@ -33,7 +33,7 @@ class RefreshToken(Base):
     )
 
     expires_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True)
+        DateTime(timezone=True),
         nullable=False,
     )
 
