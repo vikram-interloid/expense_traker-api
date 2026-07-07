@@ -1,6 +1,5 @@
 from datetime import date, datetime
 from decimal import Decimal
-from enum import Enum
 
 from sqlalchemy import (
     Date,
@@ -69,9 +68,9 @@ class Transaction(Base):
         onupdate=func.now(),
     )
     user: Mapped["User"] = relationship(
-    back_populates="transactions",
+        back_populates="transactions",
     )
 
     category: Mapped["Category"] = relationship(
-    back_populates="transactions",
+        back_populates="transactions",
     )
