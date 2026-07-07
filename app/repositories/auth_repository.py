@@ -1,0 +1,60 @@
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+
+from app.models.refresh_token import RefreshToken
+from app.models.user import User
+
+
+class AuthRepository:
+    def __init__(self, db: Session):
+        self.db = db
+
+    def get_user_by_email(
+        self, 
+        email: str
+    ) -> User | None:
+        stmt = select(User).where(User.email == email)
+        return self.db.scalar(stmt)
+
+    def get_user_by_username(
+        self,
+        username: str
+    ) -> User | None:
+        stmt = select(User).where(User.username == username)
+        return self.db.scalar(stmt)
+
+    def create_user(
+        self,
+        user: User
+    ) -> User:
+        self.db.add(user)
+        self.db.commit()
+        self.db.refresh(user)
+        return user
+
+    def create_refresh_token(
+        self,
+        refresh_token: RefreshToken,
+    ) -> RefreshToken:
+        self.db.add(refresh_token)
+        self.db.commit()
+        self.db.refresh(refresh_token)
+        return refresh_token
+
+    def get_refresh_token(
+        self, 
+        token: str
+    ) -> RefreshToken | None:
+        stmt = select(RefreshToken).where(
+            RefreshToken.token == token
+        )
+        return self.db.scalar(stmt)
+
+    def revoke_refresh_token(
+        self,
+        refresh_token: RefreshToken,
+    ) -> RefreshToken:
+        refresh_token.is_revoked = True
+        self.db.commit()
+        self.db.refresh(refresh_token)
+        return refresh_token
