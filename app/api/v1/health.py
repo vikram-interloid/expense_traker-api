@@ -36,3 +36,4 @@ def redis_health():
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail={"redis": "unavailable"},
         )
+

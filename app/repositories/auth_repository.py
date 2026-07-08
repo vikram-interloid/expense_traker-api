@@ -1,12 +1,16 @@
 from app.repositories.base import BaseRepository
 from sqlalchemy import select
-from sqlalchemy.orm import Session
+
 
 from app.models.refresh_token import RefreshToken
 from app.models.user import User
 
 
 class AuthRepository(BaseRepository):
+    
+    def get_user_by_id(self, user_id: int) -> User | None:
+        stmt = select(User).where(User.id == user_id)
+        return self.db.scalar(stmt)
     
     def get_user_by_email(self, email: str) -> User | None:
         stmt = select(User).where(User.email == email)
