@@ -18,28 +18,23 @@ class CategoryService:
         self,
         request: CategoryCreateRequest,
         current_user: User,
-    ) -> Category:
-
-        category = self.repository.get_category_by_name(
-            request.name,
-            current_user.id,
+        ) -> Category:
+        category = self.repository.get_category(
+            name=request.name,
+            category_type=request.type,
+            user_id=current_user.id,
         )
-
         if category:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
                 detail="Category already exists",
             )
-
-        new_category = Category(
+        category = Category(
             name=request.name,
             type=request.type,
             user_id=current_user.id,
-        )
-
-        return self.repository.create_category(
-            new_category,
-        )
+            )
+        return self.repository.create_category(category)
         
     def get_categories(
         self,

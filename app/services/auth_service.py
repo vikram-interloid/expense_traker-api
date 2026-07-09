@@ -53,7 +53,6 @@ class AuthService:
 
     def login(
         self,
-        # request: UserLoginRequest,
         email:str,
         password:str,
     ) -> TokenResponse:
@@ -113,6 +112,12 @@ class AuthService:
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid or expired token",
             )
+            
+        if payload.get("type") != "access":
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid access token",
+        )
         user_id = payload.get("sub")
         
         if user_id is None:
@@ -144,6 +149,11 @@ class AuthService:
         except JWTError:
             raise HTTPException(
                 status_code=401,
+                detail="Invalid refresh token",
+            )
+        if payload.get("type") != "refresh":
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid refresh token",
             )
         user_id = payload.get("sub")

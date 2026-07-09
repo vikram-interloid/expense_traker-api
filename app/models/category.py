@@ -2,13 +2,12 @@ from datetime import datetime
 from enum import Enum
 
 from sqlalchemy import DateTime, Enum as SQLEnum, ForeignKey, String, func,UniqueConstraint
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column,relationship
 
 from app.db.base import Base
 
 from typing import TYPE_CHECKING
 
-from sqlalchemy.orm import relationship
 
 if TYPE_CHECKING:
     from app.models.transaction import Transaction

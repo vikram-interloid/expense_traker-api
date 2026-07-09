@@ -1,15 +1,14 @@
-from enum import Enum
+
 
 from pydantic import BaseModel, ConfigDict, Field
 
-
-class CategoryType(str, Enum):
-    INCOME = "income"
-    EXPENSE = "expense"
-
+from app.models.category import CategoryType
 
 class CategoryCreateRequest(BaseModel):
-    name: str = Field(min_length=2, max_length=50)
+    name: str = Field(
+        min_length=2, 
+        max_length=50
+    )
     type: CategoryType
 
 

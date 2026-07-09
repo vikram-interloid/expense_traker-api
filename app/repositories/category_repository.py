@@ -1,8 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.models.category import Category
-
+from app.models.category import Category, CategoryType
 
 class CategoryRepository:
 
@@ -12,14 +11,16 @@ class CategoryRepository:
     ):
         self.db = db
 
-    def get_category_by_name(
+    def get_category(
         self,
         name: str,
+        category_type: CategoryType,
         user_id: int,
     ) -> Category | None:
 
         stmt = select(Category).where(
             Category.name == name,
+            Category.type == category_type,
             Category.user_id == user_id,
         )
 
@@ -35,6 +36,7 @@ class CategoryRepository:
         self.db.refresh(category)
 
         return category
+
 
     def get_categories(
         self,

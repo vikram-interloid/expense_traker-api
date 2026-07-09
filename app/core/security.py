@@ -34,7 +34,11 @@ def create_access_token(
         minutes=settings.access_token_expire_minutes,
     )
 
-    to_encode.update({"exp": expire})
+    to_encode.update({
+        "type":"access",
+        "exp": expire,
+        
+    })
 
     return jwt.encode(
         to_encode,
@@ -51,7 +55,10 @@ def create_refresh_token(
         days=settings.refresh_token_expire_days,
     )
 
-    to_encode.update({"exp": expire})
+    to_encode.update({
+        "type":"refresh",
+        "exp": expire,
+    })
 
     return jwt.encode(
         to_encode,
