@@ -11,14 +11,14 @@ from app.core.security import (
     verify_password,
     decode_token
 )
-
-from app.models.refresh_token import RefreshToken
-from app.models.user import User
+from app.models import User, RefreshToken
 from app.repositories.auth_repository import AuthRepository
 from app.schemas.auth import (
     TokenResponse,
     UserLoginRequest,
     UserRegisterRequest,
+    LogoutRequest
+
 )
 
 
@@ -65,7 +65,7 @@ class AuthService:
             )
     
     
- 
+
         
 
         if not verify_password(
@@ -127,6 +127,51 @@ class AuthService:
                 detail="User not found",
             )
         return user
+    
+
+    def refresh_access_token(
+        self,
+        refresh_token: str,
+        ) -> TokenResponse:
+        db_token = self.repository.get_refresh_token(refresh_token)
+        if db_token is None:
+            raise HTTPException(
+                status_code=401,
+                detail="Invalid refresh token",
+            )
+        try:
+            payload = decode_token(refresh_token)
+        except JWTError:
+            raise HTTPException(
+                status_code=401,
+                detail="Invalid refresh token",
+            )
+        user_id = payload.get("sub")
+        if user_id is None:
+            raise HTTPException(
+                status_code=401,
+                detail="Invalid refresh token",
+            )
+        access_token = create_access_token(
+            {"sub": str(user_id)}
+        )
+        return TokenResponse(
+            access_token=access_token,
+            refresh_token=refresh_token,
+        )
+        
+    def logout(
+        self,
+        refresh_token:str,
+    )-> None:
+        success = self.repository.revoke_refresh_token(
+            refresh_token,
+        )
+        if not success:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid refresh token", 
+            )
     
     
     

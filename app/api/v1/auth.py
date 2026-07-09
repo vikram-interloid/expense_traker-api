@@ -3,12 +3,15 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 from app.models.user import User
 
+
 from app.core.dependencies import get_auth_service,get_current_user
 from app.schemas.auth import (
     TokenResponse,
     UserLoginRequest,
     UserRegisterRequest,
     UserResponse,
+    RefreshTokenRequest,
+    LogoutRequest
 )
 from app.services.auth_service import AuthService
 
@@ -50,4 +53,29 @@ def me(
     current_user:User = Depends(get_current_user)
 ):
     return current_user
+
+@router.post(
+    "/refresh",
+    response_model=TokenResponse,
+    status_code=status.HTTP_200_OK,
+)
+def refresh(
+    request:RefreshTokenRequest,
+    service: AuthService = Depends(get_auth_service),
+):
+    return service.refresh_access_token(
+        request.refresh_token,
+    )
+    
+@router.post(
+    "/logout",
+    status_code=status.HTTP_200_OK,
+)
+def logout(
+    request: LogoutRequest,
+    service:AuthService=Depends(get_auth_service)  
+):
+    return {
+        "message": "logged out successfully"
+        }
     

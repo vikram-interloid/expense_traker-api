@@ -40,14 +40,17 @@ class AuthRepository(BaseRepository):
             RefreshToken.token == token
         )
         return self.db.scalar(stmt)
-
+    
     def revoke_refresh_token(
-        self,
-        refresh_token: RefreshToken,
-    ) -> RefreshToken:
+    self,
+    token: str,
+    ) -> bool:
+        refresh_token = self.get_refresh_token(token)
+        if refresh_token is None:
+            return False
         refresh_token.is_revoked = True
         self.db.commit()
         self.db.refresh(refresh_token)
-        return refresh_token
+        return True
 
 

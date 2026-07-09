@@ -32,6 +32,9 @@ class UserResponse(BaseModel):
     email: EmailStr
     created_at: datetime
 
+class LogoutRequest(BaseModel):
+    refresh_token: str
 
 class MessageResponse(BaseModel):
     message: str
+    
