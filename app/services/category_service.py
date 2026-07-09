@@ -40,3 +40,11 @@ class CategoryService:
         return self.repository.create_category(
             new_category,
         )
+        
+    def get_categories(
+        self,
+        current_user: User,
+        ) -> list[Category]:
+        return self.repository.get_categories(
+            current_user.id,
+        )

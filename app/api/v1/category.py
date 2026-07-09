@@ -31,3 +31,18 @@ def create_category(
         request,
         current_user,
     )
+    
+@router.get(
+    "",
+    response_model=list[CategoryResponse],
+    status_code=status.HTTP_200_OK,
+)
+def get_categories(
+    current_user: User = Depends(get_current_user),
+    service: CategoryService = Depends(get_category_service),
+):
+    return service.get_categories(
+        current_user,
+    )
+    
+

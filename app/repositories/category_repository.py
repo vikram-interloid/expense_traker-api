@@ -35,3 +35,14 @@ class CategoryRepository:
         self.db.refresh(category)
 
         return category
+
+    def get_categories(
+        self,
+        user_id: int,
+    ) -> list[Category]:
+        stmt = (
+            select(Category)
+            .where(Category.user_id == user_id)
+            .order_by(Category.id)
+        )
+        return list(self.db.scalars(stmt).all())
