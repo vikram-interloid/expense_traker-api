@@ -46,3 +46,17 @@ class CategoryRepository:
             .order_by(Category.id)
         )
         return list(self.db.scalars(stmt).all())
+    
+    
+    def get_category_by_id(
+        self,
+        category_id: int,user_id: int,
+        ) -> Category | None:
+        stmt = (
+            select(Category)
+            .where(
+                Category.id == category_id,
+                Category.user_id == user_id,
+                )
+            )
+        return self.db.scalar(stmt)

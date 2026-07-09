@@ -45,4 +45,19 @@ def get_categories(
         current_user,
     )
     
+@router.get(
+    "/{category_id}",
+    response_model=CategoryResponse,
+    status_code=status.HTTP_200_OK,
+)
+def get_category(
+    category_id: int,
+    current_user: User = Depends(get_current_user),
+    service: CategoryService = Depends(get_category_service),
+):
+    return service.get_category(
+        category_id,
+        current_user,
+    )
+    
 

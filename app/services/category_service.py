@@ -48,3 +48,18 @@ class CategoryService:
         return self.repository.get_categories(
             current_user.id,
         )
+    def get_category(
+        self,
+        category_id: int,
+        current_user: User,
+        ) -> Category:
+        category = self.repository.get_category_by_id(
+            category_id,
+            current_user.id,
+            )
+        if category is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Category not found",
+            )
+        return category
