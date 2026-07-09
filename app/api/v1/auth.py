@@ -75,6 +75,10 @@ def logout(
     request: LogoutRequest,
     service:AuthService=Depends(get_auth_service)  
 ):
+    service.logout(
+        request.refresh_token
+    )
+    
     return {
         "message": "logged out successfully"
         }

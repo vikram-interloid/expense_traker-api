@@ -35,9 +35,13 @@ class AuthRepository(BaseRepository):
         self.db.refresh(refresh_token)
         return refresh_token
 
-    def get_refresh_token(self, token: str) -> RefreshToken | None:
+    def get_refresh_token(
+        self, 
+        token: str
+    ) -> RefreshToken | None:
         stmt = select(RefreshToken).where(
-            RefreshToken.token == token
+            RefreshToken.token == token,
+            RefreshToken.is_revoked.is_(False),
         )
         return self.db.scalar(stmt)
     
