@@ -62,3 +62,19 @@ class CategoryRepository:
                 )
             )
         return self.db.scalar(stmt)
+    
+    def update_category(
+        self,
+        category: Category,
+        ) -> Category:
+        self.db.commit()
+        self.db.refresh(category)
+        return category
+    
+    def delete_category(
+    self,
+    category: Category,
+    ) -> None:
+        self.db.delete(category)
+        self.db.commit()
+    

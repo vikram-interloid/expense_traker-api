@@ -3,7 +3,7 @@ from fastapi import HTTPException, status
 from app.models.category import Category
 from app.models.user import User
 from app.repositories.category_repository import CategoryRepository
-from app.schemas.category import CategoryCreateRequest
+from app.schemas.category import CategoryCreateRequest,CategoryUpdateRequest
 
 
 class CategoryService:
@@ -58,3 +58,56 @@ class CategoryService:
                 detail="Category not found",
             )
         return category
+    
+    
+    def update_category(
+        self,
+        category_id: int,
+        request: CategoryUpdateRequest,
+        current_user: User,
+    ) -> Category:
+        category = self.repository.get_category_by_id(
+            category_id,
+            current_user.id,
+        )
+        if category is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Category not found",
+                )
+        duplicate = self.repository.get_category(
+            name=request.name,
+            category_type=request.type,
+            user_id=current_user.id,
+        )
+        if (
+            duplicate is not None
+            and duplicate.id != category.id
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Category already exists",
+            )
+
+        category.name = request.name
+        category.type = request.type
+        return self.repository.update_category(
+        category,
+        )
+        
+        
+    def delete_category(
+    self,
+    category_id: int,
+    current_user: User,
+    ) -> None:
+        category = self.repository.get_category_by_id(
+            category_id,
+            current_user.id,
+        )
+        if category is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Category not found",
+            )
+        self.repository.delete_category(category)

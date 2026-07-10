@@ -19,3 +19,10 @@ class CategoryResponse(BaseModel):
     name: str
     type: CategoryType
     user_id: int
+    
+class CategoryUpdateRequest(BaseModel):
+    name: str = Field(
+        min_length=2,
+        max_length=50,
+    )
+    type: CategoryType

@@ -4,7 +4,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from app.models.user import User
 
 
-from app.core.dependencies import get_auth_service,get_current_user
+from app.core.dependencies import get_auth_service,get_current_user,get_category_service
 from app.schemas.auth import (
     TokenResponse,
     UserRegisterRequest,
@@ -13,6 +13,8 @@ from app.schemas.auth import (
     LogoutRequest
 )
 from app.services.auth_service import AuthService
+
+
 
 router = APIRouter(
     prefix="/auth",
@@ -81,4 +83,4 @@ def logout(
     return {
         "message": "logged out successfully"
         }
-    
+

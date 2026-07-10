@@ -8,8 +8,10 @@ from app.models.user import User
 from app.schemas.category import (
     CategoryCreateRequest,
     CategoryResponse,
+    CategoryUpdateRequest
 )
 from app.services.category_service import CategoryService
+from app.schemas.auth import MessageResponse
 
 router = APIRouter(
     prefix="/categories",
@@ -59,5 +61,42 @@ def get_category(
         category_id,
         current_user,
     )
+    
+@router.put(
+    "/{category_id}",
+    response_model=CategoryResponse,
+    status_code=status.HTTP_200_OK,
+)
+def update_category(
+    category_id: int,
+    request: CategoryUpdateRequest,
+    current_user: User = Depends(get_current_user),
+    service: CategoryService = Depends(get_category_service),
+):
+    return service.update_category(
+        category_id,
+        request,
+        current_user,
+    )
+    
+@router.delete(
+    "/{category_id}",
+    response_model=MessageResponse,
+    status_code=status.HTTP_200_OK,
+)
+def delete_category(
+    category_id: int,
+    current_user: User = Depends(get_current_user),
+    service: CategoryService = Depends(get_category_service),
+):
+    service.delete_category(
+        category_id,
+        current_user,
+    )
+
+    return MessageResponse(
+        message="Category deleted successfully",
+    )
+    
     
 
