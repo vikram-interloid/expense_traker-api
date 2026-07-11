@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime 
 from decimal import Decimal
 
 from sqlalchemy import (
@@ -31,7 +31,7 @@ class Transaction(Base):
         index=True,
     )
 
-    amount: Mapped[Decimal] = mapped_column(
+    amount: Mapped[Decimal]= mapped_column(
         Numeric(12, 2),
         nullable=False,
     )

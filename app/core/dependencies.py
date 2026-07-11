@@ -6,11 +6,17 @@ from app.db.session import get_db
 from app.repositories.auth_repository import AuthRepository
 from app.services.auth_service import AuthService
 
+from app.repositories.transaction_repository import TransactionRepository
+from app.services.transaction_service import TransactionService
+
 from app.repositories.category_repository import CategoryRepository
 from app.services.category_service import CategoryService
 
+from app.repositories.report_repository import ReportRepository
+from app.services.report_service import ReportService
+
 oauth2_scheme = OAuth2PasswordBearer(
-    tokenUrl="/auth/login",
+    tokenUrl="/api/v1/auth/login",
 )
 
 
@@ -33,6 +39,36 @@ def get_category_service(
     repository = CategoryRepository(db)
 
     return CategoryService(repository)
+
+def get_transaction_service(
+    db: Session = Depends(get_db),
+) -> TransactionService:
+
+    repository = TransactionRepository(db)
+
+    return TransactionService(repository)
+
+def get_report_repository(
+    db: Session = Depends(get_db),
+) -> ReportRepository:
+
+    return ReportRepository(
+        db,
+    )
+
+
+def get_report_service(
+    repository: ReportRepository = Depends(
+        get_report_repository,
+    ),
+) -> ReportService:
+
+    return ReportService(
+        repository,
+    )
+
+
+
 
 
 
