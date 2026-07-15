@@ -13,9 +13,9 @@ class Settings(BaseSettings):
     database_url: str
 
     # Redis
-    redis_host: str
-    redis_port: int
-    redis_db: int
+    # redis_host: str
+    # redis_port: int
+    # redis_db: int
 
     # JWT
     secret_key: str

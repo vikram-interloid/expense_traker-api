@@ -8,7 +8,10 @@ from app.models.user import User
 from app.schemas.category import (
     CategoryCreateRequest,
     CategoryResponse,
-    CategoryUpdateRequest
+    CategoryUpdateRequest,
+    CreateCategoryResponse,
+    CategoryListResponse,
+    UpdateCategoryResponse
 )
 from app.services.category_service import CategoryService
 from app.schemas.auth import MessageResponse
@@ -21,9 +24,9 @@ router = APIRouter(
 
 @router.post(
     "",
-    response_model=CategoryResponse,
+    response_model= CreateCategoryResponse,
     status_code=status.HTTP_201_CREATED,
-)
+) 
 def create_category(
     request: CategoryCreateRequest,
     current_user: User = Depends(get_current_user),
@@ -36,7 +39,7 @@ def create_category(
     
 @router.get(
     "",
-    response_model=list[CategoryResponse],
+    response_model= CategoryListResponse,
     status_code=status.HTTP_200_OK,
 )
 def get_categories(
@@ -64,7 +67,7 @@ def get_category(
     
 @router.put(
     "/{category_id}",
-    response_model=CategoryResponse,
+    response_model= UpdateCategoryResponse,
     status_code=status.HTTP_200_OK,
 )
 def update_category(

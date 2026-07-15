@@ -15,11 +15,16 @@ from app.models import User, RefreshToken
 from app.repositories.auth_repository import AuthRepository
 from app.schemas.auth import (
     TokenResponse,
-    UserLoginRequest,
     UserRegisterRequest,
-    LogoutRequest
+    UserRegisterRequest,
+    RegisterResponse,
+    LoginResponse,
+    RefreshResponse,
+    MessageResponse
 
 )
+
+
 
 
 class AuthService:
@@ -29,7 +34,7 @@ class AuthService:
     def register(
         self,
         request: UserRegisterRequest,
-    ) -> User:
+    ) -> RegisterResponse:
 
         if self.repository.get_user_by_email(request.email):
             raise HTTPException(
@@ -49,23 +54,23 @@ class AuthService:
             password_hash=hash_password(request.password),
         )
 
-        return self.repository.create_user(user)
+        user = self.repository.create_user(user)
+        return RegisterResponse(
+            message="User registered successfully",
+            data=user,
+        )
 
     def login(
         self,
         email:str,
         password:str,
-    ) -> TokenResponse:
+    ) ->LoginResponse:
         user = self.repository.get_user_by_email(email)
         if not user:
             raise HTTPException(
                 status_code=401,
                 detail="Invalid email or password",
             )
-    
-    
-
-        
 
         if not verify_password(
             password,
@@ -94,11 +99,13 @@ class AuthService:
         )
 
         self.repository.create_refresh_token(refresh)
-
-        return TokenResponse(
-            access_token=access_token,
-            refresh_token=refresh_token,
-        )
+        
+        return {
+            "access_token": access_token,
+            "refresh_token": refresh_token,
+            "token_type": "Bearer",
+            "expires_in": settings.access_token_expire_minutes * 60,
+        }
         
     def get_current_user(
     self,
@@ -137,7 +144,7 @@ class AuthService:
     def refresh_access_token(
         self,
         refresh_token: str,
-        ) -> TokenResponse:
+        ) -> RefreshResponse:
         db_token = self.repository.get_refresh_token(refresh_token)
         if db_token is None:
             raise HTTPException(
@@ -165,15 +172,18 @@ class AuthService:
         access_token = create_access_token(
             {"sub": str(user_id)}
         )
-        return TokenResponse(
-            access_token=access_token,
-            refresh_token=refresh_token,
-        )
+        
+        return {
+            "access_token": access_token,
+            "token_type": "Bearer",
+            "expires_in": settings.access_token_expire_minutes * 60,
+        }
+        
         
     def logout(
         self,
         refresh_token:str,
-    )-> None:
+    )-> MessageResponse:
         success = self.repository.revoke_refresh_token(
             refresh_token,
         )
@@ -182,6 +192,9 @@ class AuthService:
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid refresh token", 
             )
+        return{
+            "message":"logout successful"
+        }
     
     
     

@@ -37,7 +37,7 @@ def create_access_token(
     to_encode.update({
         "type":"access",
         "exp": expire,
-        
+
     })
 
     return jwt.encode(

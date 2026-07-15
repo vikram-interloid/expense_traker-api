@@ -16,7 +16,7 @@ from app.repositories.report_repository import ReportRepository
 from app.services.report_service import ReportService
 
 oauth2_scheme = OAuth2PasswordBearer(
-    tokenUrl="/api/v1/auth/login",
+    tokenUrl="/api/v1/oauth/login",
 )
 
 
@@ -55,7 +55,6 @@ def get_report_repository(
     return ReportRepository(
         db,
     )
-
 
 def get_report_service(
     repository: ReportRepository = Depends(

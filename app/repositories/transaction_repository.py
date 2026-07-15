@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.orm import Session
 from datetime import date
 from decimal import Decimal
@@ -57,7 +57,7 @@ class TransactionRepository:
         page_size: int =10,
         sort_by: SortBy = SortBy.TRANSACTION_DATE,
         sort_order: SortOrder = SortOrder.DESC,
-        ) -> list[Transaction]:
+        ) -> tuple[list[Transaction],int]:
         stmt = (
             select(Transaction)
             .join(Category)
@@ -90,6 +90,14 @@ class TransactionRepository:
             stmt = stmt.where(
                 Transaction.amount <= max_amount,
             )
+            
+        count_stmt = select(
+            func.count()
+            ).select_from(
+                stmt.subquery()
+        )
+            
+        total_records = self.db.scalar(count_stmt) or 0
         
         if sort_by == SortBy.AMOUNT:
             column = Transaction.amount
@@ -103,9 +111,11 @@ class TransactionRepository:
         offset = (page - 1) * page_size
         stmt = stmt.offset(offset).limit(page_size)
     
-        return list(
+        transactions = list(
         self.db.scalars(stmt).all()
         )
+        
+        return transactions, total_records
         
     
     

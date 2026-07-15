@@ -9,6 +9,7 @@ from app.schemas.query_params import SortBy,SortOrder
 
 from app.models.category import CategoryType
 from datetime import date
+from math import ceil
 
 
 class TransactionService:
@@ -44,9 +45,13 @@ class TransactionService:
             user_id=current_user.id,
         )
 
-        return self.repository.create_transaction(
+        transaction = self.repository.create_transaction(
             transaction,
         )
+        return {
+            "message": "transaction created successfully",
+            "data": transaction,
+        }
         
         
     def get_transactions(
@@ -63,8 +68,8 @@ class TransactionService:
     sort_by: SortBy = SortBy.TRANSACTION_DATE,
     sort_order: SortOrder = SortOrder.DESC,
     
-    ) -> list[Transaction]:
-        return self.repository.get_transactions_by_user(
+    ):
+        transactions,total_records = self.repository.get_transactions_by_user(
             user_id=current_user.id,
             category_id=category_id,
             type=type,
@@ -77,6 +82,16 @@ class TransactionService:
             sort_by=sort_by,
             sort_order =sort_order,
         )
+        return {
+            "data": transactions,
+            "pagination": {
+                "page": page,
+                "page_size": page_size,
+                "total_records": total_records,
+                "total_pages": ceil(total_records / page_size),
+            },
+        }
+        
         
     def get_transaction_by_id(
     self,

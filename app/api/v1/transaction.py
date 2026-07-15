@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, Query
 from datetime import date
 from decimal import Decimal
 from app.schemas.query_params import SortBy,SortOrder
@@ -12,7 +12,9 @@ from app. models.category import CategoryType
 from app.schemas.transaction import (
     TransactionCreateRequest,
     TransactionResponse,
-    TransactionUpdateRequest
+    TransactionUpdateRequest,
+    CreateTransactionResponse,
+    TransactionListResponse
 )
 from app.services.transaction_service import TransactionService
 
@@ -24,7 +26,7 @@ router = APIRouter(
 
 @router.post(
     "",
-    response_model=TransactionResponse,
+    response_model= CreateTransactionResponse,
     status_code=status.HTTP_201_CREATED,
 )
 def create_transaction(
@@ -42,20 +44,20 @@ def create_transaction(
 
 @router.get(
     "",
-    response_model=list[TransactionResponse],
+    response_model= TransactionListResponse,
     status_code=status.HTTP_200_OK,
 )
 def get_transactions(
-    category_id: int | None = None,
-    type: CategoryType |None = None,
-    start_date: date | None = None,
-    end_date: date | None = None,
-    min_amount: Decimal | None = None,
-    max_amount: Decimal | None = None,
-    page: int = 1,
-    page_size: int = 10,
-    sort_by: SortBy = SortBy.TRANSACTION_DATE,
-    sort_order: SortOrder = SortOrder.DESC,
+    category_id: int | None = Query(default=None),
+    type: CategoryType |None = Query(default=None),
+    start_date: date | None = Query(default=None),
+    end_date: date | None = Query(default=None),
+    min_amount: Decimal | None = Query(default=None),
+    max_amount: Decimal | None = Query(default=None),
+    page: int = Query(default=1, ge=1),
+    page_size: int = Query(default=10, ge=1, le=100),
+    sort_by: SortBy = Query(default=SortBy.TRANSACTION_DATE),
+    sort_order: SortOrder =  Query(default=SortOrder.DESC),
     current_user: User = Depends(get_current_user),
     service: TransactionService = Depends(
         get_transaction_service,

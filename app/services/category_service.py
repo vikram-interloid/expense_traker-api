@@ -3,7 +3,13 @@ from fastapi import HTTPException, status
 from app.models.category import Category
 from app.models.user import User
 from app.repositories.category_repository import CategoryRepository
-from app.schemas.category import CategoryCreateRequest,CategoryUpdateRequest
+from app.schemas.category import (
+    CategoryCreateRequest,
+    CategoryUpdateRequest,
+    CategoryListResponse,
+    UpdateCategoryResponse,
+    
+    )
 
 
 class CategoryService:
@@ -34,15 +40,23 @@ class CategoryService:
             type=request.type,
             user_id=current_user.id,
             )
-        return self.repository.create_category(category)
+        category = self.repository.create_category(category)
+        
+        return {
+            "message": "Category created successfully",
+            "data": category,
+        }
         
     def get_categories(
         self,
         current_user: User,
-        ) -> list[Category]:
-        return self.repository.get_categories(
+        ) -> CategoryListResponse:
+        categories = self.repository.get_categories(
             current_user.id,
         )
+        return{
+            "data": categories,
+        }
     def get_category(
         self,
         category_id: int,
@@ -65,7 +79,7 @@ class CategoryService:
         category_id: int,
         request: CategoryUpdateRequest,
         current_user: User,
-    ) -> Category:
+    ) -> UpdateCategoryResponse:
         category = self.repository.get_category_by_id(
             category_id,
             current_user.id,
@@ -91,9 +105,14 @@ class CategoryService:
 
         category.name = request.name
         category.type = request.type
-        return self.repository.update_category(
+        category = self.repository.update_category(
         category,
         )
+        
+        return {
+        "message": "Category updated successfully",
+        "data": category,
+        }
         
         
     def delete_category(
