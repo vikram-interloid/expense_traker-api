@@ -1,28 +1,20 @@
 from datetime import datetime
-from enum import Enum
-
-from sqlalchemy import DateTime, Enum as SQLEnum, ForeignKey, String, func,UniqueConstraint
-from sqlalchemy.orm import Mapped, mapped_column
-
-from app.db.base import Base
-
 from typing import TYPE_CHECKING
 
-from sqlalchemy.orm import relationship
+
+from enum import Enum
+from sqlalchemy import DateTime, Enum as SQLEnum, ForeignKey, String, func,UniqueConstraint
+from sqlalchemy.orm import Mapped, mapped_column,relationship
+from app.db.base import Base
 
 if TYPE_CHECKING:
     from app.models.transaction import Transaction
     from app.models.user import User
-
-
 class CategoryType(str, Enum):
     INCOME = "income"
     EXPENSE = "expense"
-
-
 class Category(Base):
     __tablename__ = "categories"
-
     id: Mapped[int] = mapped_column(
         primary_key=True, 
             index=True

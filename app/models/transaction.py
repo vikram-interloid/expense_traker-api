@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime 
 from decimal import Decimal
 
 from sqlalchemy import (
@@ -9,20 +9,15 @@ from sqlalchemy import (
     String,
     func,
 )
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column,relationship
 
 from app.db.base import Base
 
 from typing import TYPE_CHECKING
 
-from sqlalchemy.orm import relationship
-
 if TYPE_CHECKING:
     from app.models.category import Category
     from app.models.user import User
-
-
-
 class Transaction(Base):
     __tablename__ = "transactions"
 
@@ -31,7 +26,7 @@ class Transaction(Base):
         index=True,
     )
 
-    amount: Mapped[Decimal] = mapped_column(
+    amount: Mapped[Decimal]= mapped_column(
         Numeric(12, 2),
         nullable=False,
     )

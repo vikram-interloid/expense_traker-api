@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
-from app.core.redis import redis_client
+# from app.core.redis import redis_client
 from app.db.session import get_db
 
 router = APIRouter(prefix="/health", tags=["Health"])
@@ -26,13 +26,14 @@ def database_health(db: Session = Depends(get_db)):
         )
 
 
-@router.get("/redis")
-def redis_health():
-    try:
-        redis_client.ping()
-        return {"redis": "connected"}
-    except Exception:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail={"redis": "unavailable"},
-        )
+# @router.get("/redis")
+# def redis_health():
+#     try:
+#         redis_client.ping()
+#         return {"redis": "connected"}
+#     except Exception:
+#         raise HTTPException(
+#             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+#             detail={"redis": "unavailable"},
+#         )
+
