@@ -1,5 +1,7 @@
 from datetime import datetime
 from typing import TYPE_CHECKING
+import uuid
+from sqlalchemy.dialects.postgresql import UUID
 
 from sqlalchemy.orm import relationship
 from sqlalchemy import Boolean, DateTime, ForeignKey, String, func
@@ -12,10 +14,16 @@ if TYPE_CHECKING:
 class RefreshToken(Base):
     __tablename__ = "refresh_tokens"
 
-    id: Mapped[int] = mapped_column(
-        primary_key=True,
-        index=True,
-    )
+    # id: Mapped[int] = mapped_column(
+    #     primary_key=True,
+    #     index=True,
+    # )
+    
+    id: Mapped[uuid.UUID] = mapped_column(
+    UUID(as_uuid=True),
+    primary_key=True,
+    default=uuid.uuid4,
+    ) 
 
     token: Mapped[str] = mapped_column(
         String(500),
@@ -23,7 +31,8 @@ class RefreshToken(Base):
         nullable=False,
     )
 
-    user_id: Mapped[int] = mapped_column(
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
         ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False,
     )

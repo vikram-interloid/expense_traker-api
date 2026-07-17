@@ -2,6 +2,7 @@ from sqlalchemy import select, func
 from sqlalchemy.orm import Session
 from datetime import date
 from decimal import Decimal
+from uuid import UUID
 
 
 from app.schemas .query_params import SortBy,SortOrder
@@ -19,8 +20,8 @@ class TransactionRepository:
 
     def get_category_by_id(
         self,
-        category_id: int,
-        user_id: int,
+        category_id: UUID,
+        user_id: UUID,
     ) -> Category | None:
 
         stmt = (
@@ -46,8 +47,8 @@ class TransactionRepository:
     
     def get_transactions_by_user(
         self,
-        user_id: int,
-        category_id: int | None = None,
+        user_id: UUID,
+        category_id: UUID | None = None,
         type: CategoryType | None = None,
         start_date:date |None = None,
         end_date: date | None = None,
@@ -122,8 +123,8 @@ class TransactionRepository:
     
     def get_transaction_by_id(
     self,
-    transaction_id: int,
-    user_id: int,
+    transaction_id: UUID,
+    user_id: UUID,
     ) -> Transaction | None:
         stmt = (
             select(Transaction)

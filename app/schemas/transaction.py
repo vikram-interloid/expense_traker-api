@@ -1,5 +1,6 @@
 from datetime import date, datetime
 from decimal import Decimal
+from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -8,7 +9,9 @@ from app.models.category import CategoryType
 
 class TransactionCreateRequest(BaseModel):
     amount: Decimal = Field(
-        gt=0,
+        gt= Decimal("0"),
+        decimal_places= 2,
+        max_digits=12
     )
 
     description: str | None = Field(
@@ -18,9 +21,7 @@ class TransactionCreateRequest(BaseModel):
 
     transaction_date: date
 
-    category_id: int = Field(
-        gt=0,
-    )
+    category_id: UUID 
 
 
 class CategorySummary(BaseModel):
@@ -28,7 +29,7 @@ class CategorySummary(BaseModel):
         from_attributes=True,
     )
 
-    id: int
+    id: UUID
     name: str
     type: CategoryType
 
@@ -38,13 +39,14 @@ class TransactionResponse(BaseModel):
         from_attributes=True,
     )
 
-    id: int
+    id: UUID
     amount: Decimal
     description: str | None
     transaction_date: date
     category: CategorySummary
-    user_id: int
+    user_id: UUID
     created_at: datetime
+    updated_at: datetime
 
 
 class CreateTransactionResponse(BaseModel):
@@ -54,7 +56,9 @@ class CreateTransactionResponse(BaseModel):
 
 class TransactionUpdateRequest(BaseModel):
     amount: Decimal = Field(
-        gt=0,
+        gt= Decimal("0"),
+        decimal_places= 2,
+        max_digits=12
     )
 
     description: str | None = Field(
@@ -64,9 +68,7 @@ class TransactionUpdateRequest(BaseModel):
 
     transaction_date: date
 
-    category_id: int = Field(
-        gt=0,
-    )
+    category_id: UUID 
 
 
 class PaginationResponse(BaseModel):

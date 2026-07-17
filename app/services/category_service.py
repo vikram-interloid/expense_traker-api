@@ -1,4 +1,5 @@
 from fastapi import HTTPException, status
+from uuid import UUID
 
 from app.models.category import Category
 from app.models.user import User
@@ -8,9 +9,8 @@ from app.schemas.category import (
     CategoryUpdateRequest,
     CategoryListResponse,
     UpdateCategoryResponse,
-    
     )
-
+from app.schemas.auth import MessageResponse
 
 class CategoryService:
 
@@ -47,6 +47,8 @@ class CategoryService:
             "data": category,
         }
         
+        # return CategoryListResponse.model_validate(category)
+        
     def get_categories(
         self,
         current_user: User,
@@ -59,7 +61,7 @@ class CategoryService:
         }
     def get_category(
         self,
-        category_id: int,
+        category_id: UUID,
         current_user: User,
         ) -> Category:
         category = self.repository.get_category_by_id(
@@ -76,7 +78,7 @@ class CategoryService:
     
     def update_category(
         self,
-        category_id: int,
+        category_id: UUID,
         request: CategoryUpdateRequest,
         current_user: User,
     ) -> UpdateCategoryResponse:
@@ -89,9 +91,9 @@ class CategoryService:
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Category not found",
                 )
-        duplicate = self.repository.get_category(
+        duplicate = self.repository.update_category_by_id(
             name=request.name,
-            category_type=request.type,
+            # category_type=request.type,
             user_id=current_user.id,
         )
         if (
@@ -104,7 +106,7 @@ class CategoryService:
             )
 
         category.name = request.name
-        category.type = request.type
+        # category.type = request.type
         category = self.repository.update_category(
         category,
         )
@@ -117,7 +119,7 @@ class CategoryService:
         
     def delete_category(
     self,
-    category_id: int,
+    category_id: UUID,
     current_user: User,
     ) -> None:
         category = self.repository.get_category_by_id(
@@ -129,4 +131,16 @@ class CategoryService:
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Category not found",
             )
+            
+        if self.repository.category_has_transactions(
+            category_id
+        ):
+            
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail= "category cannot be deleted because it has a associated transacation ",
+            )
         self.repository.delete_category(category)
+        return MessageResponse(
+            message= "category deleted sucessfully"
+        )

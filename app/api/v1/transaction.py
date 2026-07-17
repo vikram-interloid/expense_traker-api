@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, status, Query
 from datetime import date
 from decimal import Decimal
 from app.schemas.query_params import SortBy,SortOrder
+from uuid import UUID
 
 from app.core.dependencies import (
     get_current_user,
@@ -14,9 +15,10 @@ from app.schemas.transaction import (
     TransactionResponse,
     TransactionUpdateRequest,
     CreateTransactionResponse,
-    TransactionListResponse
+    TransactionListResponse,
 )
 from app.services.transaction_service import TransactionService
+from app.schemas.auth import ErrorResponse,MessageResponse
 
 router = APIRouter(
     prefix="/transactions",
@@ -28,6 +30,16 @@ router = APIRouter(
     "",
     response_model= CreateTransactionResponse,
     status_code=status.HTTP_201_CREATED,
+responses={
+    401: {
+        "model": ErrorResponse,
+        "description": "Unauthorized. Access token is missing, invalid, or expired.",
+    },
+    404: {
+        "model": ErrorResponse,
+        "description": "Transction not found.",
+    },
+}
 )
 def create_transaction(
     request: TransactionCreateRequest,
@@ -46,9 +58,19 @@ def create_transaction(
     "",
     response_model= TransactionListResponse,
     status_code=status.HTTP_200_OK,
+    responses={
+    401: {
+        "model": ErrorResponse,
+        "description": "Unauthorized. Access token is missing, invalid, or expired.",
+    },
+    404: {
+        "model": ErrorResponse,
+        "description": "Transaction not found.",
+    },
+}
 )
 def get_transactions(
-    category_id: int | None = Query(default=None),
+    category_id: UUID | None = Query(default=None),
     type: CategoryType |None = Query(default=None),
     start_date: date | None = Query(default=None),
     end_date: date | None = Query(default=None),
@@ -78,12 +100,22 @@ def get_transactions(
     )
     
 @router.get(
-    "/{transaction_id}",
+    "/{id}",
     response_model=TransactionResponse,
     status_code=status.HTTP_200_OK,
+    responses={
+    401: {
+        "model": ErrorResponse,
+        "description": "Unauthorized. Access token is missing, invalid, or expired.",
+    },
+    404: {
+        "model": ErrorResponse,
+        "description": "Transaction not found.",
+    },
+}
 )
 def get_transaction_by_id(
-    transaction_id: int,
+    transaction_id: UUID,
     current_user: User = Depends(get_current_user),
     service: TransactionService = Depends(
         get_transaction_service,
@@ -94,12 +126,12 @@ def get_transaction_by_id(
         current_user,
     )                                                                    
 @router.put(
-    "/{transaction_id}",
+    "/{id}",
     response_model=TransactionResponse,
     status_code=status.HTTP_200_OK,
 )
 def update_transaction(
-    transaction_id: int,
+    transaction_id: UUID,
     request: TransactionUpdateRequest,
     current_user: User = Depends(get_current_user),
     service: TransactionService = Depends(
@@ -114,11 +146,21 @@ def update_transaction(
     
     
 @router.delete(
-    "/{transaction_id}",
+    "/{id}",
     status_code=status.HTTP_204_NO_CONTENT,
+    responses={
+    401: {
+        "model": ErrorResponse,
+        "description": "Unauthorized. Access token is missing, invalid, or expired.",
+    },
+    404: {
+        "model": ErrorResponse,
+        "description": "Transaction not found.",
+    },
+}
 )
 def delete_transaction(
-    transaction_id: int,
+    transaction_id: UUID,
     current_user: User = Depends(get_current_user),
     service: TransactionService = Depends(
         get_transaction_service,

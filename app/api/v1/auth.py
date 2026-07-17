@@ -14,7 +14,8 @@ from app.schemas.auth import (
     RegisterResponse,
     LoginResponse,
     RefreshResponse,
-    MessageResponse
+    MessageResponse,
+    ErrorResponse
 )
 from app.services.auth_service import AuthService
 
@@ -31,6 +32,12 @@ oauth = APIRouter(
     "/register",
     response_model=RegisterResponse,
     status_code=status.HTTP_201_CREATED,
+    responses={
+        409:{
+            "model": ErrorResponse,
+            "description": "Email or Username already exists",
+        }
+    }
 )
 def register(
     request: UserRegisterRequest,
@@ -44,6 +51,12 @@ def register(
     "/login",
     response_model= LoginResponse,
     status_code=status.HTTP_200_OK,
+    responses={
+        401:{
+            "model": ErrorResponse,
+            "description": "Invalid email or password"
+        },
+    }
 )
 def login(
     request: UserLoginRequest,
@@ -57,7 +70,13 @@ def login(
 @oauth.post(
     "/login",
     response_model= TokenResponse,
-    status_code= status.HTTP_200_OK, 
+    status_code= status.HTTP_200_OK,
+    responses={
+        401:{
+            "model": ErrorResponse,
+            "description": "Invalid email or password",
+        },
+    }
     
 )
 def login(
@@ -72,7 +91,13 @@ def login(
 @router.get(
     "/me",
     response_model=UserResponse,
-    status_code=status.HTTP_200_OK
+    status_code=status.HTTP_200_OK,
+    responses= {
+        401: {
+            "model": ErrorResponse,
+            "description": "Invalid or expired access token",
+        }
+    },
 )
 def me(
     current_user:User = Depends(get_current_user)
@@ -83,6 +108,12 @@ def me(
     "/refresh",
     response_model=RefreshResponse,
     status_code=status.HTTP_200_OK,
+    responses={
+        401:{
+            "model": ErrorResponse,
+            "description": "Invalid or expired refresh token",
+        }
+    }
 )
 def refresh(
     request:RefreshTokenRequest,
@@ -96,6 +127,12 @@ def refresh(
     "/logout",
     response_model= MessageResponse,
     status_code=status.HTTP_200_OK,
+    responses={
+        401:{
+            "model":ErrorResponse,
+            "description":"Invalid refresh token",
+        },
+    }
 )
 def logout(
     request: LogoutRequest,

@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, status,Query
+from datetime import datetime
 
 from app.core.dependencies import (
     get_current_user,
@@ -7,8 +8,9 @@ from app.core.dependencies import (
 from app.models.user import User
 from app.schemas.report import TotalIncomeResponse,TotalExpenseResponse,BalanceResponse,MonthlyReportResponse,YearlyReportResponse
 from app.services.report_service import ReportService
+from app.schemas.auth import ErrorResponse
 
-
+CURRENT_YEAR = datetime.now().year
 
 router = APIRouter(
     prefix="/reports",
@@ -19,6 +21,12 @@ router = APIRouter(
     "/total-income",
     response_model=TotalIncomeResponse,
     status_code=status.HTTP_200_OK,
+    responses={
+    401: {
+        "model": ErrorResponse,
+        "description": "Unauthorized. Access token is missing, invalid, or expired.",
+    },
+}
 )
 def get_total_income(
     current_user: User = Depends(get_current_user),
@@ -39,6 +47,12 @@ def get_total_income(
     "/total-expense",
     response_model=TotalExpenseResponse,
     status_code=status.HTTP_200_OK,
+    responses={
+    401: {
+        "model": ErrorResponse,
+        "description": "Unauthorized. Access token is missing, invalid, or expired.",
+    },
+}
 )
 def get_total_expense(
     current_user: User = Depends(get_current_user),
@@ -56,6 +70,12 @@ def get_total_expense(
     "/balance",
     response_model=BalanceResponse,
     status_code=status.HTTP_200_OK,
+    responses={
+    401: {
+        "model": ErrorResponse,
+        "description": "Unauthorized. Access token is missing, invalid, or expired.",
+    },
+}
 )
 def get_balance(
     current_user: User = Depends(get_current_user),
@@ -74,9 +94,16 @@ def get_balance(
     "/monthly",
     response_model=MonthlyReportResponse,
     status_code=status.HTTP_200_OK,
+    responses={
+    401: {
+        "model": ErrorResponse,
+        "description": "Unauthorized. Access token is missing, invalid, or expired.",
+    },
+}
+    
 )
 def get_monthly_report(
-    year: int = Query(..., ge=2000),
+    year: int = Query(..., ge=2000, le=CURRENT_YEAR +1,),
     month: int = Query(..., ge=1, le=12),
     current_user: User = Depends(get_current_user),
     service: ReportService = Depends(get_report_service),
@@ -92,9 +119,15 @@ def get_monthly_report(
     "/yearly",
     response_model=YearlyReportResponse,
     status_code=status.HTTP_200_OK,
+    responses={
+    401: {
+        "model": ErrorResponse,
+        "description": "Unauthorized. Access token is missing, invalid, or expired.",
+    },
+}
 )
 def get_yearly_report(
-    year: int = Query(..., ge=2000),
+    year: int = Query(..., ge=2000, le =CURRENT_YEAR + 1),
     current_user: User = Depends(get_current_user),
     service: ReportService = Depends(get_report_service),
 ):

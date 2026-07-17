@@ -4,8 +4,9 @@ from app.schemas.transaction import TransactionCreateRequest,TransactionUpdateRe
 
 from fastapi import HTTPException, status
 from app.models import User, Transaction
-from decimal import Decimal
+from decimal import Decimal,ROUND_HALF_UP
 from app.schemas.query_params import SortBy,SortOrder
+from uuid import UUID
 
 from app.models.category import CategoryType
 from datetime import date
@@ -38,7 +39,10 @@ class TransactionService:
             )
 
         transaction = Transaction(
-            amount=request.amount,
+            amount=request.amount.quantize(
+                Decimal("0.01"),
+                rounding=ROUND_HALF_UP,  
+            ),
             description=request.description,
             transaction_date=request.transaction_date,
             category_id=request.category_id,
@@ -57,7 +61,7 @@ class TransactionService:
     def get_transactions(
     self,
     current_user: User,
-    category_id: int | None = None,
+    category_id: UUID | None = None,
     type: CategoryType | None = None,
     start_date: date | None = None,
     end_date: date | None = None,
@@ -95,7 +99,7 @@ class TransactionService:
         
     def get_transaction_by_id(
     self,
-    transaction_id: int,
+    transaction_id: UUID,
     current_user: User,
     ) -> Transaction:
         transaction = self.repository.get_transaction_by_id(
@@ -112,7 +116,7 @@ class TransactionService:
     
     def update_transaction(
     self,
-    transaction_id: int,
+    transaction_id: UUID,
     request: TransactionUpdateRequest,
     current_user: User,
     ) -> Transaction:
@@ -134,7 +138,11 @@ class TransactionService:
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Category not found",
             )
-        transaction.amount = request.amount
+        transaction.amount = request.amount.quantize(
+            Decimal("0.01"),
+            rounding=ROUND_HALF_UP,
+            
+        )
         transaction.description = request.description
         transaction.transaction_date = request.transaction_date
         transaction.category_id = request.category_id
@@ -145,7 +153,7 @@ class TransactionService:
         
     def delete_transaction(
     self,
-    transaction_id: int,
+    transaction_id: UUID,
     current_user: User,
     ) -> None:
 

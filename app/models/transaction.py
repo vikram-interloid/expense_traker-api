@@ -1,5 +1,7 @@
 from datetime import date, datetime 
 from decimal import Decimal
+import uuid
+from sqlalchemy.dialects.postgresql import UUID
 
 from sqlalchemy import (
     Date,
@@ -21,11 +23,15 @@ if TYPE_CHECKING:
 class Transaction(Base):
     __tablename__ = "transactions"
 
-    id: Mapped[int] = mapped_column(
-        primary_key=True,
-        index=True,
+    # id: Mapped[int] = mapped_column(
+    #     primary_key=True,
+    #     index=True,
+    # )
+    id: Mapped[uuid.UUID] = mapped_column(
+    UUID(as_uuid=True),
+    primary_key=True,
+    default=uuid.uuid4,
     )
-
     amount: Mapped[Decimal]= mapped_column(
         Numeric(12, 2),
         nullable=False,
@@ -42,12 +48,14 @@ class Transaction(Base):
         nullable=False,
     )
 
-    category_id: Mapped[int] = mapped_column(
+    category_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
         ForeignKey("categories.id", ondelete="CASCADE"),
         nullable=False,
     )
 
-    user_id: Mapped[int] = mapped_column(
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
         ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False,
     )

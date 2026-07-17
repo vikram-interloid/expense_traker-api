@@ -14,7 +14,8 @@ from app.schemas.category import (
     UpdateCategoryResponse
 )
 from app.services.category_service import CategoryService
-from app.schemas.auth import MessageResponse
+from app.schemas.auth import MessageResponse,ErrorResponse
+from uuid import UUID
 
 router = APIRouter(
     prefix="/categories",
@@ -26,6 +27,17 @@ router = APIRouter(
     "",
     response_model= CreateCategoryResponse,
     status_code=status.HTTP_201_CREATED,
+    responses={
+    401: {
+        "model": ErrorResponse,
+        "description": "Unauthorized. Access token is missing, invalid, or expired.",
+    },
+    409: {
+        "model": ErrorResponse,
+        "description": "Category already exists.",
+    },
+}
+    
 ) 
 def create_category(
     request: CategoryCreateRequest,
@@ -41,6 +53,16 @@ def create_category(
     "",
     response_model= CategoryListResponse,
     status_code=status.HTTP_200_OK,
+        responses={
+    401:{
+        "model":ErrorResponse,
+        "description":"Unauthorized",
+    },
+    404:{
+        "model":ErrorResponse,
+        "description":"Category not found",
+    },
+}
 )
 def get_categories(
     current_user: User = Depends(get_current_user),
@@ -51,12 +73,22 @@ def get_categories(
     )
     
 @router.get(
-    "/{category_id}",
+    "/{id}",
     response_model=CategoryResponse,
     status_code=status.HTTP_200_OK,
+    responses={
+    401: {
+        "model": ErrorResponse,
+        "description": "Unauthorized. Access token is missing, invalid, or expired.",
+    },
+    404: {
+        "model": ErrorResponse,
+        "description": "Category not found.",
+    },
+}
 )
 def get_category(
-    category_id: int,
+    category_id: UUID,
     current_user: User = Depends(get_current_user),
     service: CategoryService = Depends(get_category_service),
 ):
@@ -66,12 +98,26 @@ def get_category(
     )
     
 @router.put(
-    "/{category_id}",
+    "/{id}",
     response_model= UpdateCategoryResponse,
     status_code=status.HTTP_200_OK,
+    responses={
+    401: {
+        "model": ErrorResponse,
+        "description": "Unauthorized. Access token is missing, invalid, or expired.",
+    },
+    404: {
+        "model": ErrorResponse,
+        "description": "Category not found.",
+    },
+    409: {
+        "model": ErrorResponse,
+        "description": "Category name already exists.",
+    },
+}
 )
 def update_category(
-    category_id: int,
+    category_id: UUID,
     request: CategoryUpdateRequest,
     current_user: User = Depends(get_current_user),
     service: CategoryService = Depends(get_category_service),
@@ -83,12 +129,26 @@ def update_category(
     )
     
 @router.delete(
-    "/{category_id}",
+    "/{id}",
     response_model=MessageResponse,
     status_code=status.HTTP_200_OK,
+    responses={
+    401: {
+        "model": ErrorResponse,
+        "description": "Unauthorized. Access token is missing, invalid, or expired.",
+    },
+    404: {
+        "model": ErrorResponse,
+        "description": "Category not found.",
+    },
+    409: {
+        "model": ErrorResponse,
+        "description": "Category cannot be deleted because it has associated transactions.",
+    },
+}
 )
 def delete_category(
-    category_id: int,
+    category_id: UUID,
     current_user: User = Depends(get_current_user),
     service: CategoryService = Depends(get_category_service),
 ):

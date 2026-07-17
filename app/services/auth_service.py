@@ -2,6 +2,7 @@
 from jose import JWTError    
 from datetime import datetime, timedelta, timezone
 from fastapi import HTTPException ,status
+from uuid import UUID
 
 from app.core.config import settings
 from app.core.security import (
@@ -23,6 +24,8 @@ from app.schemas.auth import (
     MessageResponse
 
 )
+
+
 
 
 
@@ -132,7 +135,7 @@ class AuthService:
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid token payload",
             )
-        user = self.repository.get_user_by_id(int(user_id))
+        user = self.repository.get_user_by_id(UUID(user_id))
         if user is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,

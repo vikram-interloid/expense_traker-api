@@ -149,23 +149,7 @@ http://127.0.0.1:8000/redoc
 
 ---
 
-# Docker
 
-## Build Docker Image
-
-```bash
-docker build -t expense-tracker-api .
-```
-
-## Run Container
-
-```bash
-docker run -d \
---name expense-api \
--p 8000:8000 \
---env-file .env \
-expense-tracker-api
-```
 
 ---
 

@@ -1,5 +1,5 @@
 from datetime import datetime
-
+from uuid import UUID
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 class UserRegisterRequest(BaseModel):
     username: str = Field(min_length=3, max_length=50)
@@ -8,7 +8,7 @@ class UserRegisterRequest(BaseModel):
 class UserResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    id: int
+    id: UUID
     username: str
     email: EmailStr
     created_at: datetime  
@@ -37,4 +37,8 @@ class LogoutRequest(BaseModel):
     refresh_token: str
 class MessageResponse(BaseModel):
     message: str
+    
+class ErrorResponse(BaseModel):
+    detail: str
+
     

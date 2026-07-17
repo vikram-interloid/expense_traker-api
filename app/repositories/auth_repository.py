@@ -1,5 +1,6 @@
 from app.repositories.base import BaseRepository
 from sqlalchemy import select
+from uuid import UUID
 
 
 from app.models.refresh_token import RefreshToken
@@ -8,7 +9,7 @@ from app.models.user import User
 
 class AuthRepository(BaseRepository):
     
-    def get_user_by_id(self, user_id: int) -> User | None:
+    def get_user_by_id(self, user_id: UUID) -> User | None:
         stmt = select(User).where(User.id == user_id)
         return self.db.scalar(stmt)
     

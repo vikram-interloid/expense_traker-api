@@ -3,6 +3,7 @@ from decimal import Decimal
 from sqlalchemy import func,select,extract
 from app.models import Transaction,Category
 from app.models.category import CategoryType
+from uuid import UUID
 
 
 
@@ -14,7 +15,7 @@ class ReportRepository:
         self.db =db
     def get_total_income(
         self,
-        user_id: int,
+        user_id: UUID,
         year: int | None = None,
         month: int | None = None,
     ) ->Decimal:
@@ -55,7 +56,7 @@ class ReportRepository:
     
     def get_total_expense(
     self,
-    user_id: int,
+    user_id: UUID,
     year: int | None = None,
     month: int | None = None,
     ) -> Decimal:

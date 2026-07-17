@@ -1,6 +1,7 @@
 
 
 from pydantic import BaseModel, ConfigDict, Field
+from uuid import UUID
 
 from app.models.category import CategoryType
 from datetime import datetime
@@ -13,10 +14,10 @@ class CategoryCreateRequest(BaseModel):
 class CategoryResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    id: int
+    id: UUID
     name: str
     type: CategoryType
-    user_id: int
+    user_id: UUID
     created_at: datetime
     updated_at : datetime
 class CreateCategoryResponse(BaseModel):
@@ -29,7 +30,7 @@ class CategoryUpdateRequest(BaseModel):
         min_length=2,
         max_length=50,
     )
-    type: CategoryType  
+
 class UpdateCategoryResponse(BaseModel):
     message: str
     data: CategoryResponse    

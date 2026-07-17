@@ -1,5 +1,7 @@
 from datetime import datetime
 from typing import TYPE_CHECKING
+import uuid
+from sqlalchemy.dialects.postgresql import  UUID
 
 
 from enum import Enum
@@ -15,9 +17,10 @@ class CategoryType(str, Enum):
     EXPENSE = "expense"
 class Category(Base):
     __tablename__ = "categories"
-    id: Mapped[int] = mapped_column(
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
         primary_key=True, 
-            index=True
+        default=uuid.uuid4,
     )
 
     name: Mapped[str] = mapped_column(
@@ -31,7 +34,8 @@ class Category(Base):
         nullable=False,
     )
 
-    user_id: Mapped[int] = mapped_column(
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
         ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False,
     )

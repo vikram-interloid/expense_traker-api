@@ -1,5 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
+from app.models.transaction import Transaction
+from uuid import UUID
 
 from app.models.category import Category, CategoryType
 
@@ -15,7 +17,7 @@ class CategoryRepository:
         self,
         name: str,
         category_type: CategoryType,
-        user_id: int,
+        user_id: UUID,
     ) -> Category | None:
 
         stmt = select(Category).where(
@@ -40,7 +42,7 @@ class CategoryRepository:
 
     def get_categories(
         self,
-        user_id: int,
+        user_id: UUID,
     ) -> list[Category]:
         stmt = (
             select(Category)
@@ -52,7 +54,7 @@ class CategoryRepository:
     
     def get_category_by_id(
         self,
-        category_id: int,user_id: int,
+        category_id: UUID,user_id: UUID,
         ) -> Category | None:
         stmt = (
             select(Category)
@@ -61,6 +63,19 @@ class CategoryRepository:
                 Category.user_id == user_id,
                 )
             )
+        return self.db.scalar(stmt)
+    
+    def update_category_by_id(
+        self,
+        name: str,
+        user_id: UUID,
+        ) -> Category | None:
+
+        stmt = select(Category).where(
+            Category.name == name,
+            Category.user_id == user_id,
+        )
+
         return self.db.scalar(stmt)
     
     def update_category(
@@ -77,4 +92,14 @@ class CategoryRepository:
     ) -> None:
         self.db.delete(category)
         self.db.commit()
+    
+    
+    def category_has_transactions(
+        self,
+        category_id: UUID,
+    ) ->bool:
+        stmt = select(Transaction).where(
+            Transaction.category_id == category_id,
+        )
+        return self.db.scalar(stmt) is not None
     
